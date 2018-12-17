@@ -2,12 +2,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
 class Linear_Regression():
     def __init__(self):
         self.__m = 0 # y = m*x + n
         self.__n = 0 # n = y - m*n
 
+    # Not using now maybe later ----------------------------------------------
     def Ordinary_Least_Squares(self,x,y):
         mean_x = np.mean(x)
         mean_y = np.mean(y)
@@ -17,13 +17,24 @@ class Linear_Regression():
         
         self.__m = Cov_xy / Var_x
         self.__n = np.mean(y) - self.__m * np.mean(x)
-        
-    def SOS_Error(x,y,m,n):
-        error = np.sum((y - (m * x + n)) ** 2) / np.size(x)
-        return error
-        
+    # -------------------------------------------------------------------------
+    def SOS_Error_m(self,x,y,m,n):
+        m_slope = np.sum((-2 * x) * (y - (m * x + n))) / np.size(x)
+        return m_slope
+    
+    def SOS_Error_n(self,x,y,m,n):
+        n_slope = np.sum(-2 * (y - (m * x + n))) / np.size(x)
+        return n_slope
+    
+    def Gradient_Descent(self,x,y,m = 0,n = 0,learn_rate = .001,iter = 100):
+        for i in range(iter):
+            m = m - (self.SOS_Error_m(x,y,m,n) * learn_rate)
+            n = n - (self.SOS_Error_n(x,y,m,n) * learn_rate)
+        self.__m = m
+        self.__n = n
+    
     def fit(self,x,y):
-        self.Ordinary_Least_Squares(x,y)
+        self.Gradient_Descent(x,y)
     
     def predict(self,x):
         prediction = (self.__m * x) + self.__n
